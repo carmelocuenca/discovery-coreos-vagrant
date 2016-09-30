@@ -1,3 +1,26 @@
+La primera herramienta para el descubrimiento es [confd](https://github.com/kelseyhightower/confd), una utilidad que interroga un repositorio de claves valor y que tiene un lenguaje de plantillas para actualizar un fichero, también tiene acciones para realizar cuando la plantilla cambia.
+Como en CoreOS no tiene gestor de paquetes, el fichero confd.dockerfile define la imagen de la utilidad. Para construir la imagen
+
+```
+core@core-01 ~ $ docker build -f share/confd.dockerfile -t confd .
+```
+
+Para comprobar el funcionamiento
+
+```
+core@core-01 ~ $ docker run --rm -v /tmp/:/tmp -v $PWD/share/etc/confd:/etc/confd -e COREOS_PRIVATE_IPV4=$COREOS_PRIVATE_IPV4 confd
+```
+
+Y desde otro shell en core-01
+
+```
+core@core-01 ~ $ etcdctl set /myapp/database/url db.example.com
+core@core-01 ~ $ etcdctl set /myapp/database/user rob
+core@core-01 ~ $ cat /tmp/myconfig.conf
+```
+
+Para esta demo resulta importante compartir el directorio ```/tmp``` del host para comprobar que el fichero ha sido actualizado (si no, se actualizaría únicamente en el contenedor).
+
 # CoreOS Vagrant
 
 This repo provides a template Vagrantfile to create a CoreOS virtual machine using the VirtualBox software hypervisor.

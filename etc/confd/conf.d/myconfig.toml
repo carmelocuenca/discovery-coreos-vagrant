@@ -1,0 +1,12 @@
+#
+# /etc/confd/conf.d/myconfig.toml
+#
+
+[template]
+src = "myconfig.conf.tmpl"
+dest = "/tmp/myconfig.conf"
+keys = [
+    "/myapp/database/url",
+    "/myapp/database/user",
+]
+
