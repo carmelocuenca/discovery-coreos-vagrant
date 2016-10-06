@@ -1,0 +1,16 @@
+# some-data.service
+[Unit]
+Description=Setup a data volume that containers can consume and store data in
+# this unit will only start after docker.service
+After=docker.service
+Requires=docker.service
+[Service]
+# the    systemd wait time during  starting  the service before  marking it as    failed
+TimeoutStartSec=0
+# returns information about a volume
+ExecStartPre=-/usr/bin/docker volume inspect some-postgres
+# we start docker container
+ExecStart=/usr/bin/docker volume create --name some-data
+# ExecStop= Remove volumes? You cannot remove a volume that is in use by a container
+[Install]
+WantedBy=multi-user.target

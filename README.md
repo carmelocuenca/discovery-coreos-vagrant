@@ -21,6 +21,53 @@ core@core-01 ~ $ cat /tmp/myconfig.conf
 
 Para esta demo resulta importante compartir el directorio ```/tmp``` del host para comprobar que el fichero ha sido actualizado (si no, se actualizaría únicamente en el contenedor).
 
+Instalado también un plugin para realizar scp a las máquinas vagrant
+
+```
+$ vagrant plugin install vagrant-scp
+```
+
+# Unit para PostgreSQL
+
+El fichero postgresql contiene una vesión inicial.
+
+Para habilitarlo
+```
+core@core-01 ~ $ sudo cp postgresql.service /etc/systemd/system/
+core@core-01 ~ $ sudo systemctl enable postgresql.service
+Created symlink /etc/systemd/system/multi-user.target.wants/postgresql.service → /etc/systemd/system/postgresql.service.
+```
+
+Para lanzarlo
+
+```
+core@core-01 ~ $ sudo systemctl start postgresql.service
+```
+
+Para ver por donde va
+```
+core@core-01 ~ $ sudo journalctl -f -u postgresql.service
+```
+
+Para conectarte
+```
+core@core-01 ~ $ docker run -it --rm --link some-postgres:postgres postgres psql -h postgres -U postgres
+```
+
+# Unit para Ruby on Rails
+
+
+
+# Inicialición de servicios
+```
+core@core-01 ~ $ sudo cp share/units/*.service /etc/systemd/system
+core@core-01 ~ $ sudo systemctl start nginx.service
+```
+
+# 06 de octubre
+Creadas 4 unidades de servicio
+
+
 # CoreOS Vagrant
 
 This repo provides a template Vagrantfile to create a CoreOS virtual machine using the VirtualBox software hypervisor.

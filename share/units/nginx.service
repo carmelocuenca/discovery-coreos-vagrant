@@ -1,0 +1,21 @@
+[Unit]
+Description=Nginx (pronounced "engine-x") is an open source reverse proxy server and a web server (origin server)
+# this unit will only start after docker.service
+After=docker.service some-data.service social-app.service
+Requires=docker.service some-data.service social-app.service
+[Service]
+# The    systemd        wait    time    during  starting        the service     before  marking it
+# as    failed
+TimeoutStartSec=0
+# nginx image will be pulled from docker public registry
+ExecStartPre=/usr/bin/docker pull nginx
+# we use rm just in case the container with the name "some-nginx" is left
+ExecStartPre=-/usr/bin/docker rm some-nginx
+# we start docker container
+ExecStart=/usr/bin/docker run --rm --name some-nginx \
+  --link social-app:app \
+  -v "/home/core/share/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf" \
+  -v "some-data:/usr/src/" -p 8080:80 nginx
+ExecStop=/usr/bin/docker stop some-nginx
+[Install]
+WantedBy=multi-user.target
