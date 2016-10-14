@@ -1,3 +1,39 @@
+# Version 0.1
+
+Definidos 4 servicios
+
+- `nginx.service`
+- `social-app.service` (la aplicación sample_app)
+- `some-data.service` (contenedor de datos para almacenar la base de datos y el directorio public de NGINX)
+- `postgresql.service`
+
+en el directorio `share\units\`. Estos ficheros definen servicios Docker para systemd.
+También ontienen las depependencias internas entre ellos.
+Las variables compartidas de entorno están en el fichero  `share\units\fleet_machines.env`
+
+Para levantar la infraestructura:
+
+
+```
+core@core-01 ~ $ sudo cp share/units/*.service /etc/systemd/system/
+core@core-01 ~ $ sudo systemctl enable nginx.service
+core@core-01 ~ $ sudo systemctl start nginx.servic
+core@core-01  ~$ sudo systemctl start nginx.service
+```
+
+Y a esperar sus minutos...
+.....................
+
+Para comprobar los servicios
+```
+core@core-01 ~ $ journalctl -f -u [some-data.service|...].service
+```
+
+Y al final
+```
+core@core-01 ~ $ curl localhost:8080
+```
+
 La primera herramienta para el descubrimiento es [confd](https://github.com/kelseyhightower/confd), una utilidad que interroga un repositorio de claves valor y que tiene un lenguaje de plantillas para actualizar un fichero, también tiene acciones para realizar cuando la plantilla cambia.
 Como en CoreOS no tiene gestor de paquetes, el fichero confd.dockerfile define la imagen de la utilidad. Para construir la imagen
 
@@ -14,7 +50,7 @@ core@core-01 ~ $ docker run --rm -v /tmp/:/tmp -v $PWD/share/etc/confd:/etc/conf
 Y desde otro shell en core-01
 
 ```
-core@core-01 ~ $ etcdctl set /myapp/database/url db.example.com
+core@core-01 ~ $ sudo cp share/units/*.service /etc/systemd/system/
 core@core-01 ~ $ etcdctl set /myapp/database/user rob
 core@core-01 ~ $ cat /tmp/myconfig.conf
 ```
@@ -33,7 +69,7 @@ El fichero postgresql contiene una vesión inicial.
 
 Para habilitarlo
 ```
-core@core-01 ~ $ sudo cp postgresql.service /etc/systemd/system/
+core@core-01 ~ $ sudo cp share/units/*.service /etc/systemd/system/
 core@core-01 ~ $ sudo systemctl enable postgresql.service
 Created symlink /etc/systemd/system/multi-user.target.wants/postgresql.service → /etc/systemd/system/postgresql.service.
 ```
@@ -46,8 +82,15 @@ core@core-01 ~ $ sudo systemctl start postgresql.service
 
 Para ver por donde va
 ```
-core@core-01 ~ $ sudo journalctl -f -u postgresql.service
+core@core-01 ~ $ journalctl -f -u postgresql.service
 ```
+
+Para recargar
+```
+core@core-01 ~ $ sudo systemctl daemon-reload
+```
+
+
 
 Para conectarte
 ```

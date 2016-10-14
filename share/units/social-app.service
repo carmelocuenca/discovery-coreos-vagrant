@@ -9,16 +9,19 @@ Requires=docker.service some-data.service postgresql.service
 # The    systemd        wait    time    during  starting        the service     before  marking it
 # as    failed
 TimeoutStartSec=0
+# EnvironmentFile reads the environment variables from a text file
+EnvironmentFile=/home/core/share/units/fleet_machines.env
 # sample_app image will be pulled from docker public registry
 ExecStartPre=/usr/bin/docker pull carmelocuenca/social-app:0.1
 # we use rm just in case the container with the name "some-social-app" is left
 ExecStartPre=-/usr/bin/docker rm social-app
+ExecStartPre=/bin/bash -c "echo Variables $PWD $POSTGRES_USER $POSTGRES_PASSWORD"
 # we start docker container
 ExecStart=/usr/bin/docker run --rm --name social-app \
   -v "some-data:/usr/src/app" \
   --link "some-postgres:db" \
   -w "/usr/src/app" \
-  -e "POSTGRES_USER=postgres" -e "POSTGRES_PASSWORD=password" \
+  -e "POSTGRES_USER=${POSTGRES_USER}" -e "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" \
   -e "WEB_CONCURRENCY=1" -e "RAILS_MAX_THREADS=16" carmelocuenca/social-app:0.1 \
   /bin/bash -c 'cp config/database.yml.postgresql config/database.yml && rake db:setup && rake db:migrate && rake db:populate && puma -C config/puma.rb'
 ExecStop=/usr/bin/docker stop social-app

@@ -7,6 +7,8 @@ Requires=docker.service some-data.service
 # The    systemd        wait    time    during  starting        the service     before  marking it
 # as    failed
 TimeoutStartSec=0
+# EnvironmentFile reads the environment variables from a text file
+EnvironmentFile=/home/core/share/units/fleet_machines.env
 # postgres image will be pulled from docker public registry
 ExecStartPre=/usr/bin/docker pull postgres
 # we use rm just in case the container with the name "some-postgres" is left
@@ -14,7 +16,8 @@ ExecStartPre=-/usr/bin/docker rm some-postgres
 # we start docker container
 ExecStart=/usr/bin/docker run --rm --name some-postgres \
   -v "some-data:/var/lib/posgresql" \
-  -e "POSTGRES_PASSWORD=password" -p 5432:5432 postgres
+  -e "POSTGRES_USER=${POSTGRES_USER}" -e "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" \
+  -p 5432:5432 postgres
 ExecStop=/usr/bin/docker stop some-postgres
 [Install]
 WantedBy=multi-user.target
